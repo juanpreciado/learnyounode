@@ -48,7 +48,7 @@
 //     }
 // });
 
-//Exercise 5
+//Exercise 6
 //MAKE IT MODULAR
 
 // var mymodule = require("./mymodule.js");
@@ -65,7 +65,7 @@
 //     }
 // });
 
-//Exercise 6
+//Exercise 7
 //HTTP CLIENT
 
 // var url = process.argv[2];
@@ -76,7 +76,7 @@
 //     });
 // });
 
-//Exercise 7
+//Exercise 8
 //HTTP COLLECT
 
 // var httpHandler = require("http");
@@ -95,49 +95,126 @@
 // });
 
 
-//Exercise 8
+//Exercise 9
 //JUGGLING ASYNC
 
-var httpHandler = require("http");
-const BufferList = require('bl');
-var urls = [];
-urls[0] = process.argv[2];
-urls[1] = process.argv[3];
-urls[2] = process.argv[4];
+// var httpHandler = require("http");
+// const BufferList = require('bl');
+// var urls = [];
+// urls[0] = process.argv[2];
+// urls[1] = process.argv[3];
+// urls[2] = process.argv[4];
+//
+// var textUrls = [];
+// textUrls[0] = "";
+// textUrls[1] = "";
+// textUrls[2] = "";
+//
+// var count = 0;
+//
+// for (var i = 0; i < urls.length; i++) {
+//     function doHttpRequest (n) {
+//         httpHandler.get(urls[i], function (response) {
+//
+//             response.on('data', function(data) {
+//
+//                 textUrls[n]+= data.toString();
+//
+//             });
+//             response.on("end", function() {
+//                 count++;
+//
+//                 if (count === 3) {
+//
+//
+//                     for (var j = 0; j < textUrls.length; j++) {
+//                         console.log(textUrls[j]);
+//
+//                     }
+//                 }
+//
+//             })
+//         });
+//     }
+//     doHttpRequest(i);
+// }
 
-var textUrls = [];
-textUrls[0] = "";
-textUrls[1] = "";
-textUrls[2] = "";
+//Exercise 10
+//TIME SERVER
+// var net = require("net");
+// var server = net.createServer(function (socket) {
+//     var date = new Date();
+//     var data = date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+ "\n";
+//     socket.write(data);
+//     socket.end();
+// });
+// server.listen(process.argv[2]);
 
-var count = 0;
+//Exercise 11
+//HTTP FILE SERVER
 
-for (var i = 0; i < urls.length; i++) {
-    function doHttpRequest (n) {
-        httpHandler.get(urls[i], function (response) {
-          
-            response.on('data', function(data) {
+// var http = require("http");
+// var fs = require("fs");
+//
+// var server = http.createServer(function (req, res) {
+//     var fsStream = fs.createReadStream(process.argv[3]);
+//     fsStream.pipe(res);
+// });
+// server.listen(process.argv[2]);
 
-                textUrls[n]+= data.toString();
+//Exercise 12
+//HTTP UPPERCASERER
 
-            });
-            response.on("end", function() {
-                count++;
+// var http = require("http");
+// var map = require("through2-map");
+//
+// var server = http.createServer(function (req, res) {
+//     if (req.method == "POST") {
+//         // console.log(req.body);
+//         // console.log(req.body.toString());
+//         req.pipe(map(function (chunk) {
+//             return chunk.toString().toUpperCase();
+//         })).pipe(res);
+//     }
+// });
+// server.listen(process.argv[2]);
 
-                if (count === 3) {
+//Exercise 13
+//HTTP JSON API SERVER
+
+var http = require("http");
+var url = require("url");
+
+var server = http.createServer(function (req, res) {
+    if (req.method == "GET") {
+        var parsedUrl = url.parse(req.url, true);
 
 
-                    for (var j = 0; j < textUrls.length; j++) {
-                        console.log(textUrls[j]);
+        if (parsedUrl.pathname === '/api/parsetime') {
+            var dateString = parsedUrl.query.iso;
+            var date = new Date(dateString);
+            var objResponse = {
+                "hour": date.getHours(),
+                "minute":date.getMinutes(),
+                "second": date.getSeconds()
+            }
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            res.write(JSON.stringify(objResponse));
+            res.end();
 
-                    }
-                }
+        }
+        if (parsedUrl.pathname === '/api/unixtime') {
+            var dateString = parsedUrl.query.iso;
+            var date = new Date(dateString);
+            var objResponse = {
+                "unixtime": date.getTime()
 
-            })
-        });
+            }
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            res.write(JSON.stringify(objResponse));
+            res.end();
+        }
     }
-    doHttpRequest(i);
-}
+});
 
-
-
+server.listen(process.argv[2]);
